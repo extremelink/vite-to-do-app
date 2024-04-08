@@ -1,7 +1,7 @@
 import Header from './components/Header';
 import CreateToDo from './components/CreateToDo';
-// import Container from '@mui/material'
 import Container from '@mui/material/Container';
+import ToDoList from './components/ToDoList';
 
 const App = () => {
   return (
@@ -9,6 +9,7 @@ const App = () => {
       <Header />
       <Container sx={{paddingTop:'80px'}}>
         <CreateToDo />
+        <ToDoList />
       </Container>
     </div>
   )

@@ -4,10 +4,13 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Modal from '@mui/material/Modal';
 import Autocomplete from '@mui/material/Autocomplete';
-import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import axios from"axios"
+import Fab from '@mui/material/Fab'
+import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
+import ToDoList from './ToDoList';
 
 const style = {
   position: 'absolute',
@@ -23,13 +26,19 @@ const style = {
   p: 4,
 };
 
+const addToBtnStyle={
+position:'fixed',
+bottom:20,
+left:'50%',
+}
+
 const priorityOptions=[
   {label:'High',value:"high"},
   {label:'Medium',value:"medium"},
   {label:'Low',value:"low"}
 ]
 
-export default function CreateToDo() {
+export default function CreateToDo(props) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -39,9 +48,61 @@ export default function CreateToDo() {
   const [date,setDate]=React.useState('');
   console.log(task,description,priority,date);
 
+  const resetForm=()=>{
+    setTask('');
+    setDescrption('');
+    setPriority('');
+    setDate('');
+  }
+  const validateForm=()=>{
+    if(task.length<3){
+      alert('Minimum length of Task should be 3')
+      return;
+    }
+
+    if(description.length<5){
+      alert('Minimum length of description should be 5')
+      return;
+    }
+    if(priority.length<2){
+      alert('invalid priority')
+      return;
+    }
+    if(date.length<2){
+      alert('invalid date')
+      return;
+    }
+
+  }
+
+  const handleFormSubmit=async ()=>{
+    // validation
+    validateForm();
+    const taskValues={
+      'task':task,
+      'description':description,
+      'priority':priority,
+      'date':date
+    }
+    // axios.post('https://my-projects-653c4-default-rtdb.asia-southeast1.firebasedatabase.app/todo.json',taskValues)
+    props.addNewTask(taskValues);
+    // alert Success
+    alert("form submitted successfully!!")
+    // resetForm
+    resetForm();
+    // close modal
+    handleClose();
+  }
+
   return (
     <div>
-      <Button onClick={handleOpen} variant='outlined'>Open modal</Button>
+      <Fab
+       color='success'
+       style={addToBtnStyle}
+       onClick={handleOpen}
+      >
+        <AddCircleSharpIcon />
+      </Fab>
       <Modal
         open={open}
         onClose={handleClose}
@@ -81,9 +142,12 @@ export default function CreateToDo() {
             )}
           />
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker label="Select Date" sx={{mb:2,width:'100%'}} defaultValue={dayjs('2022-04-17')} />
+            <DatePicker 
+              label="Select Date" 
+              sx={{mb:2,width:'100%'}} 
+              onChange={value=>setDate(value.format('YYYY-MM-DD'))}/>
           </LocalizationProvider>
-          <Button variant='contained' fullWidth>
+          <Button variant='contained' fullWidth onClick={handleFormSubmit}>
             Add To The List
           </Button>
 
